@@ -15,10 +15,10 @@ MyMesh* Incremental::calculateConvHull(MyMesh* mesh)
 	    }
 	    else if(i == 4)
 	    {
-	        for(OpenMesh::VertexHandle vh : hull.vertices())
+	        for(OpenMesh::VertexHandle vhh : hull.vertices())
 	        {
-	            VertexVertexCCWIter vvccwit = hull.vv_ccwiter(vh);
-	            hull.add_face(vh, vvccwit[0], vvccwit[1]);
+	            VertexVertexCCWIter vvccwit = hull.vv_ccwiter(vhh);
+	            hull.add_face(vhh, vvccwit[0], vvccwit[1]);
 	        }
 	        i++;
 	    }

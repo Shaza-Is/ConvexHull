@@ -12,9 +12,9 @@ class ConvexHull
 {
 public:
 	MyMesh* getHull(MyMesh* mesh);
-	
+
 private:
-	HullAlgorithm * Algorithm;        
+	HullAlgorithm * algorithm;        
 };
 
 #endif //CONVEXHULL_H
