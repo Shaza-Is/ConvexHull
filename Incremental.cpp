@@ -7,6 +7,7 @@ MyMesh* Incremental::calculateConvHull(MyMesh* mesh)
 	MyMesh* hull;
 	int i = 0;
 	float vol = 0;
+	std::vector<MyMesh::FaceHandle> visible_face_handles;
 	for (MyMesh::VertexHandle vh : mesh.vertices())
 	{
 	    //initial face
@@ -25,10 +26,10 @@ MyMesh* Incremental::calculateConvHull(MyMesh* mesh)
 	    //incrementing HULL
 	    else
 	    {
-	    	std::vector<MyMesh::FaceHandle> visible_face_handles;
+	    	
+	    	visible_face_handles.clear();
 	    	for(MyMesh::FaceHandle facehandle : hull.faces())
-	    	{
-	    		visible_face_handles.clear();
+	    	{	    		
 	    		//calculating volume and set it in vol
 	    		MyMesh::FaceVertexIter fv_it = hull.fv_iter(facehandle)
 
