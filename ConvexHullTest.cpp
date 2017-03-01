@@ -20,7 +20,7 @@ int main()
 	}
 
 /*algorithm*/
-	cHull.getHull(&mesh);
+	hull = cHull.getHull(&mesh);
 
 /*writer*/
 	if (!OpenMesh::IO::write_mesh(hull, "ConvexHull.off")) 
