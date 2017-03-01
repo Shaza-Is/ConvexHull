@@ -5,7 +5,7 @@ include_directories (
 )
 set (targetName ConvexHull)
 # collect all header and source files
-acg_append_files (headers "*.hh" .)
+acg_append_files (headers "*.h" .)
 acg_append_files (sources "*.cpp" .)
 acg_add_executable (${targetName} ${headers} ${sources})
 target_link_libraries (${targetName}
