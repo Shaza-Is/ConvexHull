@@ -28,18 +28,28 @@ MyMesh* Incremental::calculateConvHull(MyMesh* mesh)
 	    {
 	    	
 	    	visible_face_handles.clear();
+	    	 OpenMesh::Vec3f vecs[3];
 	    	for(MyMesh::FaceHandle facehandle : hull.faces())
 	    	{	    		
 	    		//calculating volume and set it in vol
 	    		MyMesh::FaceVertexIter fv_it = hull.fv_iter(facehandle)
 
-				for(; fv_it.is_valid(); ++fv_it) {
+				for(int j =0; fv_it.is_valid(); ++fv_it) {
 					auto vec = *fv_it - mesh.point(vh);
-					float ax = vec[0];
-					float ay = vec[1];
-					float az = vec[2];
+					vecs[j] = vec;
+					j++;
 				} 
+				vol = vecs[0][0]*((vecs[1][1]*vecs[2][2])-(vecs[1][2]*vecs[2][1]))
+					  vecs[0][1]*((vecs[1][2]*vecs[2][0])-(vecs[1][0]*vecs[2][2]))
+					  vecs[0][2]*((vecs[1][0]*vecs[2][1])-(vecs[1][1]*vecs[2][0]));
+				if(vol > 0){
+					visible_face_handles.push_back(facehandle);
+				}
 
+	    	}
+	    	if (!visible_face_handles.empty())
+	    	{
+	    		//add the point to hull and form cone faces and delete previously visible faces
 	    	}
 	    //vh ----> the point : judge if it's in the hull
 	    	//looping over face handles of hull 
