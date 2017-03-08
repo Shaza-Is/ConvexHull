@@ -4,16 +4,12 @@ CONFIG -= app_bundle
 CONFIG -= qt
 INCLUDEPATH += /usr/local/include/OpenMesh
 
-LIBS += -L/usr/local/lib
+LIBS += -L/usr/local/lib -lOpenMeshTools -lOpenMeshCore
 SOURCES += main.cpp \
-    Incremental.cpp \
-    ConvexHull.cpp \
-    HullAlgorithm.cpp \
+    Incremental.cpp
 
 
 HEADERS += \
-    Incremental.h \
-    ConvexHull.h \
-    HullAlgorithm.h \
+    Incremental.h
 
 

@@ -1,30 +1,32 @@
 // -------------------- C++
 #include <iostream>
-#include "ConvexHull.h"
+
 // -------------------- OpenMesh
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-typedef OpenMesh::TriMesh_ArrayKernelT<> MyMesh;
+
+#include "ConvexHull.h"
+typedef OpenMesh::TriMesh_ArrayKernelT<> TriMesh;
 using namespace std;
 
 int main()
 {
-    MyMesh mesh;
-    MyMesh* hull;
-    ConvexHull cHull;
+    TriMesh mesh;
+    TriMesh hull;
+    Incremental cHull;
 
     /*reader*/
-    if (!OpenMesh::IO::read_mesh(mesh, "input.off"))
+    if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/input.ply"))
     {
         std::cerr << "read error\n";
         exit(1);
     }
 
     /*algorithm*/
-    hull = cHull.getHull(&mesh);
+    hull = cHull.calculateConvHull(mesh);
 
     /*writer*/
-    if (!OpenMesh::IO::write_mesh(*hull, "ConvexHull.off"))
+    if (!OpenMesh::IO::write_mesh(hull, "/home/shaza/Desktop/output.ply"))
     {
         std::cerr << "write error\n";
         exit(1);

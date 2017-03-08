@@ -8,10 +8,16 @@
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 typedef OpenMesh::TriMesh_ArrayKernelT<> MyMesh;
 
+enum Algorithms
+{
+    IncrementalAlogrithm
+};
+
 class ConvexHull
 {
 public:
-	MyMesh* getHull(MyMesh* mesh);
+    ConvexHull(Algorithms a=IncrementalAlogrithm);
+    MyMesh getHull(const MyMesh &mesh);
 
 private:
 	HullAlgorithm * algorithm;        
