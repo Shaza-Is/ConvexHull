@@ -69,7 +69,7 @@ TriMesh Incremental::calculateConvHull(const TriMesh& mesh)
             {
                 if (hull.n_faces() > 1)
                 {
-                    hull.delete_face(fh, true);
+                    hull.delete_face(fh, false);
                 }
             }
 
@@ -86,8 +86,18 @@ TriMesh Incremental::calculateConvHull(const TriMesh& mesh)
                     {
                         auto vh0 = hull.from_vertex_handle(he);
                         auto vh1 = hull.to_vertex_handle(he);
-                        hull.add_face(hull_v, vh1, vh0); //to be completed
+                        //auto fh = hull.add_face(hull_v, vh1, vh0); //to be completed
+
+                        if(!OpenMesh::is_zero(OpenMesh::dot(hull.point(hull_v),
+                        OpenMesh::cross(hull.point(vh0), hull.point(vh1)))))
+                        hull.add_face(hull_v, vh1, vh0);
+
+
                         //MeshProcessing::writeMesh(hull, "D:/test"+ std::to_sMyng(z) +".ply");
+                        //if(!fh)
+                        //{
+                        //    hull.add_face(hull_v, vh0, vh1);
+                        //}
                     }
                     z++;
                 }
