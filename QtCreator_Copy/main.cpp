@@ -24,7 +24,7 @@ int main()
     hull = cHull.getHull(&mesh);
 
     /*writer*/
-    if (!OpenMesh::IO::write_mesh(hull, "ConvexHull.off"))
+    if (!OpenMesh::IO::write_mesh(*hull, "ConvexHull.off"))
     {
         std::cerr << "write error\n";
         exit(1);

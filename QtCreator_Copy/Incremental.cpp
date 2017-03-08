@@ -56,7 +56,7 @@ MyMesh* Incremental::calculateConvHull(MyMesh* mesh)
                 {
                     if(MyMesh::is_boundary(he))
                     {
-                        hull->add_face(vh,,);
+                        hull->add_face(vh,,); //to be completed
                     }
                 }
             }
