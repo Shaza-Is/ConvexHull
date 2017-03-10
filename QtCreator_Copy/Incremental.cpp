@@ -37,7 +37,7 @@ TriMesh Incremental::calculateConvHull(const TriMesh& mesh)
                 hull.add_vertex(mesh.point(vh));
                 if(!OpenMesh::is_zero(OpenMesh::dot(hull.point(OpenMesh::VertexHandle(0)),
                 OpenMesh::cross(hull.point(OpenMesh::VertexHandle(1)), hull.point(OpenMesh::VertexHandle(sim))))))
-                hull.add_face(OpenMesh::VertexHandle(0), OpenMesh::VertexHandle(1), OpenMesh::VertexHandle(sim));
+                hull.add_face(OpenMesh::VertexHandle(0), OpenMesh::VertexHandle(sim), OpenMesh::VertexHandle(1));
                 else
                 {
                     sim++;
@@ -65,13 +65,14 @@ TriMesh Incremental::calculateConvHull(const TriMesh& mesh)
                 }
             }
 
-            for (const auto&fh : visible_face_handles)
+            /*for (auto&fh : visible_face_handles)
             {
                 if (hull.n_faces() > 1)
                 {
-                    hull.delete_face(fh, false);
+                    hull.delete_face(fh, true);
+                    fh.invalidate();
                 }
-            }
+            }*/
 
 
             if (vis_face_count > 0)
@@ -84,13 +85,18 @@ TriMesh Incremental::calculateConvHull(const TriMesh& mesh)
                 {
                     if(hull.is_boundary(he))
                     {
-                        auto vh0 = hull.from_vertex_handle(he);
-                        auto vh1 = hull.to_vertex_handle(he);
+                        auto heh = he;
+                        do{
+                            auto vh0 = hull.from_vertex_handle(heh);
+                            auto vh1 = hull.to_vertex_handle(heh);
                         //auto fh = hull.add_face(hull_v, vh1, vh0); //to be completed
 
-                        if(!OpenMesh::is_zero(OpenMesh::dot(hull.point(hull_v),
-                        OpenMesh::cross(hull.point(vh0), hull.point(vh1)))))
-                        hull.add_face(hull_v, vh1, vh0);
+                            //if(!OpenMesh::is_zero(OpenMesh::dot(hull.point(hull_v),
+                            //OpenMesh::cross(hull.point(vh0), hull.point(vh1)))))
+                            hull.add_face(hull_v, vh0, vh1);
+                            heh = hull.next_halfedge_handle(heh);
+                        }while(heh != he);
+                            break;
 
 
                         //MeshProcessing::writeMesh(hull, "D:/test"+ std::to_sMyng(z) +".ply");
@@ -110,6 +116,7 @@ TriMesh Incremental::calculateConvHull(const TriMesh& mesh)
 
             //if not in hull add the point to hull and form cone faces
         }
+
     }
 
     hull.garbage_collection();
