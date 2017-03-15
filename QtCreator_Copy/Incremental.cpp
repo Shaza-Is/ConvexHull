@@ -88,8 +88,8 @@ void Incremental::incremental()
 				for (const auto& fvh : mHullMesh.fv_range(fh))
 					tetrahedronEdges[j++] = mHullMesh.point(fvh) - point;
 
-                // check if the tetrahedron volume is -ve to make sure it is outside the hull mesh
-                if (OpenMesh::dot(tetrahedronEdges[0], OpenMesh::cross(tetrahedronEdges[1], tetrahedronEdges[2])) < 0.0f)
+                // check if the tetrahedron volume is +ve to make sure it is outside the hull mesh
+                if (OpenMesh::dot(tetrahedronEdges[2], OpenMesh::cross(tetrahedronEdges[1], tetrahedronEdges[0])) > (std::numeric_limits<float>::epsilon()))
 					visibleFaces.push_back(fh);
 			}
             //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/before_del.ply");
@@ -114,7 +114,7 @@ void Incremental::incremental()
                         //mHullMesh.add_face(fromVh, toVh, hullVh);
                         if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
                         {
-                            OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
+                            //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
 
                             std::cout << "beta3" << std::endl;
                             break;
