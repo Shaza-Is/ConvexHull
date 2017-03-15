@@ -13,7 +13,7 @@ int main()
 {
     TriMesh mesh;
     TriMesh hull;
-    Incremental cHull;
+
 
     /*reader*/
     if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/input.ply"))
@@ -23,7 +23,8 @@ int main()
     }
 
     /*algorithm*/
-    hull = cHull.calculateConvHull(mesh);
+    Incremental cHull(mesh);
+    hull = cHull.getResult();
 
     /*writer*/
     if (!OpenMesh::IO::write_mesh(hull, "/home/shaza/Desktop/output.ply"))

@@ -1,129 +1,151 @@
-// -------------------- C++
+// -------------------- C++ 
 #include <array>
 #include <iostream>
 #include "Incremental.h"
 //#include "MeshProcessing\MeshProcessing.h"
-//#include <sMyng>
 
-//sing namespace Symbyo::CG;
 
-TriMesh Incremental::calculateConvHull(const TriMesh& mesh)
+Incremental::Incremental( const TriMesh& _mesh )
+    :mInputMesh(_mesh)
 {
-    TriMesh hull;
+	incremental();
+}
 
-    int i = 0;
-    int sim = 2;
+TriMesh Incremental::getResult() const
+{
+	return mHullMesh;
+}
 
-    //std::vector<TriMesh::FaceHandle> visible_face_handles;
+void Incremental::createInitialTetrahedron()
+{
+	// create the initial hull (the processed point will be marked as tagged)
 
-    hull.request_vertex_status();
-    hull.request_face_status();
-    hull.request_edge_status();
+    for (const auto& vh : mInputMesh.fv_range(OpenMesh::FaceHandle((mInputMesh.n_faces()-1)/2)))
+	{
+        mInputMesh.status(vh).set_tagged(true);
+		mHullMesh.add_vertex(mInputMesh.point(vh));
+	}
 
-    for (const auto& vh : mesh.vertices())
-    {
-        int vis_face_count = 0;
-        //initial face
-        if(i < 3)
-        {
-            hull.add_vertex(mesh.point(vh));
-            i++;
+    auto normal = mInputMesh.calc_face_normal(OpenMesh::FaceHandle((mInputMesh.n_faces()-1)/2));
+    auto d = -OpenMesh::dot(normal, mHullMesh.point(OpenMesh::VertexHandle(0)));
+
+    OpenMesh::VertexHandle maxVh;
+	auto maxDistance = 0.0f;
+
+	for (const auto& vh : mInputMesh.vertices())
+	{
+		auto distance = std::fabs(OpenMesh::dot(normal, mInputMesh.point(vh)) + d); 
+        if (distance > maxDistance)
+		{
+			maxDistance = distance;
+			maxVh = vh;
         }
-        //incrementing HULL
-        else
-        {
-            if(i == 3)
-            {
-                hull.add_vertex(mesh.point(vh));
-                if(!OpenMesh::is_zero(OpenMesh::dot(hull.point(OpenMesh::VertexHandle(0)),
-                OpenMesh::cross(hull.point(OpenMesh::VertexHandle(1)), hull.point(OpenMesh::VertexHandle(sim))))))
-                hull.add_face(OpenMesh::VertexHandle(0), OpenMesh::VertexHandle(sim), OpenMesh::VertexHandle(1));
-                else
-                {
-                    sim++;
-                    continue;
-                }
-                i++;
-            }
-
-            std::array<OpenMesh::Vec3f, 3> vecs;
-            std::vector<TriMesh::FaceHandle> visible_face_handles;
-
-            for(const auto& fh : hull.faces())
-            {
-                //calculating volume and set it in vol
-                int j = 0;
-                for(const auto& fvh : hull.fv_range(fh))
-                {
-                    vecs[j++] = hull.point(fvh) - mesh.point(vh);
-                }
-
-                if (OpenMesh::is_gt(OpenMesh::dot(vecs[0], OpenMesh::cross(vecs[1], vecs[2])), 0.0f))
-                {
-                    visible_face_handles.push_back(fh);
-                    vis_face_count++;
-                }
-            }
-
-            /*for (auto&fh : visible_face_handles)
-            {
-                if (hull.n_faces() > 1)
-                {
-                    hull.delete_face(fh, true);
-                    fh.invalidate();
-                }
-            }*/
+	}
 
 
-            if (vis_face_count > 0)
-            {
-                //add the point to hull and form cone faces and delete previously visible faces
-                auto hull_v = hull.add_vertex(mesh.point(vh));
+	mInputMesh.status(maxVh).set_tagged(true);
+	mHullMesh.add_vertex(mInputMesh.point(maxVh));
 
-                int z = 0;
-                for(auto he : hull.halfedges())
-                {
-                    if(hull.is_boundary(he))
-                    {
-                        auto heh = he;
-                        do{
-                            auto vh0 = hull.from_vertex_handle(heh);
-                            auto vh1 = hull.to_vertex_handle(heh);
-                        //auto fh = hull.add_face(hull_v, vh1, vh0); //to be completed
+	// triangulate the hull
+    mHullMesh.add_face(OpenMesh::VertexHandle(0), OpenMesh::VertexHandle(1), OpenMesh::VertexHandle(2));
+    mHullMesh.add_face(OpenMesh::VertexHandle(3), OpenMesh::VertexHandle(0), OpenMesh::VertexHandle(2));
+    mHullMesh.add_face(OpenMesh::VertexHandle(2), OpenMesh::VertexHandle(1), OpenMesh::VertexHandle(3));
+    mHullMesh.add_face(OpenMesh::VertexHandle(3), OpenMesh::VertexHandle(1), OpenMesh::VertexHandle(0));
+}
 
-                            //if(!OpenMesh::is_zero(OpenMesh::dot(hull.point(hull_v),
-                            //OpenMesh::cross(hull.point(vh0), hull.point(vh1)))))
-                            hull.add_face(hull_v, vh0, vh1);
-                            heh = hull.next_halfedge_handle(heh);
-                        }while(heh != he);
+void Incremental::incremental()
+{
+	mInputMesh.request_vertex_status();
+
+	createInitialTetrahedron();
+
+	mHullMesh.request_vertex_status();
+	mHullMesh.request_face_status();
+	mHullMesh.request_edge_status();
+
+	// get a point that doesn't lie on the same plane as the face
+	for (const auto& vh : mInputMesh.vertices())
+	{
+        std::vector<OpenMesh::FaceHandle> visibleFaces;
+        visibleFaces.clear();
+		if (!mInputMesh.status(vh).tagged())
+		{
+			mInputMesh.status(vh).set_tagged(true);
+
+			for(const auto& fh : mHullMesh.faces())
+			{
+				//calculating volume
+				std::array<OpenMesh::Vec3f, 3> tetrahedronEdges;
+				int j = 0;
+				auto point = mInputMesh.point(vh);
+
+				//for(auto itr = hull.fv_ccwbegin(fh); itr != hull.fv_ccwend(fh); ++itr) 
+				for (const auto& fvh : mHullMesh.fv_range(fh))
+					tetrahedronEdges[j++] = mHullMesh.point(fvh) - point;
+
+                // check if the tetrahedron volume is -ve to make sure it is outside the hull mesh
+                if (OpenMesh::dot(tetrahedronEdges[0], OpenMesh::cross(tetrahedronEdges[1], tetrahedronEdges[2])) < 0.0f)
+					visibleFaces.push_back(fh);
+			}
+            OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/before_del.ply");
+
+
+			for (const auto&fh : visibleFaces)
+                mHullMesh.delete_face(fh, true);
+            mHullMesh.garbage_collection();
+
+
+			if (!visibleFaces.empty())
+			{
+				//add the point to hull and form cone faces and delete previously visible faces
+				auto hullVh = mHullMesh.add_vertex(mInputMesh.point(vh));
+
+				for(auto heh : mHullMesh.halfedges())
+				{
+					if(mHullMesh.is_boundary(heh))
+					{
+						auto fromVh = mHullMesh.from_vertex_handle(heh);
+						auto toVh = mHullMesh.to_vertex_handle(heh);
+                        if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
+                        {
+                            OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
+
+                            std::cout << "beta3" << std::endl;
                             break;
 
+                        }
+					}
+				}
+			}
+			//		MeshProcessing::writeMesh(hull, "D:/test.ply");
+		}
+	}
 
-                        //MeshProcessing::writeMesh(hull, "D:/test"+ std::to_sMyng(z) +".ply");
-                        //if(!fh)
-                        //{
-                        //    hull.add_face(hull_v, vh0, vh1);
-                        //}
-                    }
-                    z++;
-                }
-            }
-            //vh ----> the point : judge if it's in the hull
-            //looping over face handles of hull
-            //calculate volume of tetrahedron formed by the point of vh and the face
-            //if the volume is +ve --> mark the face visible ##delete it from hull
-            //at the end of loop if no faces are visible then the point inside the hull
+	mInputMesh.release_vertex_status();
 
-            //if not in hull add the point to hull and form cone faces
-        }
+	mHullMesh.release_face_status();
+	mHullMesh.release_vertex_status();
+	mHullMesh.release_edge_status();
 
-    }
+    //flipHullMesh();
+}
 
-    hull.garbage_collection();
+void Incremental::flipHullMesh()
+{
+	TriMesh flippedHull;
 
-    hull.release_face_status();
-    hull.release_vertex_status();
-    hull.release_edge_status();
+	for (const auto& vh : mHullMesh.vertices())
+		flippedHull.add_vertex(mHullMesh.point(vh));
 
-    return hull;
+    std::array<OpenMesh::VertexHandle, 3> flippedFaceVhs;
+	for (const auto& fh : mHullMesh.faces())
+	{
+		int i = 0;
+		for (const auto& fvh : mHullMesh.fv_range(fh))
+			flippedFaceVhs[i++] = fvh;
+
+		flippedHull.add_face(flippedFaceVhs[2], flippedFaceVhs[1], flippedFaceVhs[0]);
+	}
+
+	mHullMesh = flippedHull;
 }
