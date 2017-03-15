@@ -16,15 +16,15 @@ int main()
 
 
     /*reader*/
-    if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/input.ply"))
+    if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/terr.ply"))
     {
         std::cerr << "read error\n";
         exit(1);
     }
 
     /*algorithm*/
-    Incremental cHull(mesh);
-    hull = cHull.getResult();
+    ConvexHull cHull(mesh);
+    hull = cHull.getHull();
 
     /*writer*/
     if (!OpenMesh::IO::write_mesh(hull, "/home/shaza/Desktop/output.ply"))

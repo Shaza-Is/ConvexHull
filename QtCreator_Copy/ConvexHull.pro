@@ -6,10 +6,14 @@ INCLUDEPATH += /usr/local/include/OpenMesh
 
 LIBS += -L/usr/local/lib -lOpenMeshTools -lOpenMeshCore
 SOURCES += main.cpp \
-    Incremental.cpp
+    Incremental.cpp \
+    ConvexHull.cpp \
+    HullAlgorithm.cpp
 
 
 HEADERS += \
-    Incremental.h
+    Incremental.h\
+    ConvexHull.h\
+    HullAlgorithm.h
 
 

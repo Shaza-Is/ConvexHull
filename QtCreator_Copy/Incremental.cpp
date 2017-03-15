@@ -13,20 +13,25 @@ Incremental::Incremental( const TriMesh& _mesh )
 
 TriMesh Incremental::getResult() const
 {
-	return mHullMesh;
+    return mHullMesh;
+}
+
+Incremental::~Incremental()
+{
+
 }
 
 void Incremental::createInitialTetrahedron()
 {
 	// create the initial hull (the processed point will be marked as tagged)
 
-    for (const auto& vh : mInputMesh.fv_range(OpenMesh::FaceHandle((mInputMesh.n_faces()-1)/2)))
+    for (const auto& vh : mInputMesh.fv_range(OpenMesh::FaceHandle(0)))
 	{
         mInputMesh.status(vh).set_tagged(true);
 		mHullMesh.add_vertex(mInputMesh.point(vh));
 	}
 
-    auto normal = mInputMesh.calc_face_normal(OpenMesh::FaceHandle((mInputMesh.n_faces()-1)/2));
+    auto normal = mInputMesh.calc_face_normal(OpenMesh::FaceHandle(0));
     auto d = -OpenMesh::dot(normal, mHullMesh.point(OpenMesh::VertexHandle(0)));
 
     OpenMesh::VertexHandle maxVh;
@@ -87,7 +92,7 @@ void Incremental::incremental()
                 if (OpenMesh::dot(tetrahedronEdges[0], OpenMesh::cross(tetrahedronEdges[1], tetrahedronEdges[2])) < 0.0f)
 					visibleFaces.push_back(fh);
 			}
-            OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/before_del.ply");
+            //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/before_del.ply");
 
 
 			for (const auto&fh : visibleFaces)
@@ -106,14 +111,15 @@ void Incremental::incremental()
 					{
 						auto fromVh = mHullMesh.from_vertex_handle(heh);
 						auto toVh = mHullMesh.to_vertex_handle(heh);
-                        if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
+                        mHullMesh.add_face(fromVh, toVh, hullVh);
+                        /*if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
                         {
                             OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
 
                             std::cout << "beta3" << std::endl;
                             break;
 
-                        }
+                        }*/
 					}
 				}
 			}

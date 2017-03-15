@@ -2,13 +2,18 @@
 #include <iostream>
 #include "ConvexHull.h"
 
-ConvexHull::ConvexHull(Algorithms a)
+ConvexHull::ConvexHull(const TriMesh &_mesh, Algorithms a)
 {
     if(a == IncrementalAlogrithm)
-    algorithm = new Incremental();
+    algorithm = new Incremental(_mesh);
 }
 
-MyMesh ConvexHull::getHull(const MyMesh& mesh)
+TriMesh ConvexHull::getHull()
 {
-    return algorithm->calculateConvHull(mesh);
+    return algorithm->getResult();
+}
+
+ConvexHull::~ConvexHull()
+{
+    delete algorithm;
 }

@@ -2,16 +2,15 @@
 #define HULLALGORITHM_H
 // -------------------- OpenMesh
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-typedef OpenMesh::TriMesh_ArrayKernelT<> MyMesh;
+typedef OpenMesh::TriMesh_ArrayKernelT<> TriMesh;
 
 
 
 class HullAlgorithm
 {
 public:
-    virtual  MyMesh calculateConvHull(const MyMesh& mesh)=0;
-
-
+    virtual TriMesh getResult() const=0;
+    virtual ~HullAlgorithm();
 };
 
 #endif //HULLALGORITHM_H
