@@ -16,7 +16,7 @@ int main()
 
 
     /*reader*/
-    if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/terr.ply"))
+    if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/output_ref.ply"))
     {
         std::cerr << "read error\n";
         exit(1);
