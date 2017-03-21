@@ -1,4 +1,4 @@
-// -------------------- C++ 
+// -------------------- C++
 #include <array>
 #include <iostream>
 #include "Incremental.h"
@@ -65,8 +65,9 @@ void Incremental::incremental()
 	createInitialTetrahedron();
 
 	mHullMesh.request_vertex_status();
+    mHullMesh.request_halfedge_status();
 	mHullMesh.request_face_status();
-	mHullMesh.request_edge_status();
+    mHullMesh.request_edge_status();
 
 	// get a point that doesn't lie on the same plane as the face
 	for (const auto& vh : mInputMesh.vertices())
@@ -95,32 +96,37 @@ void Incremental::incremental()
             //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/before_del.ply");
 
 
-			for (const auto&fh : visibleFaces)
+            for (const auto&fh : visibleFaces)
+            {
+                for(const auto&he : mHullMesh.fh_range(fh))
+                    mHullMesh.status(he).set_tagged(true);
                 mHullMesh.delete_face(fh, true);
+            }
             mHullMesh.garbage_collection();
 
 
 			if (!visibleFaces.empty())
 			{
-				//add the point to hull and form cone faces and delete previously visible faces
-				auto hullVh = mHullMesh.add_vertex(mInputMesh.point(vh));
+                //add the point to hull and form cone faces and delete previously visible faces
+                auto hullVh = mHullMesh.add_vertex(mInputMesh.point(vh));
 
-				for(auto heh : mHullMesh.halfedges())
+                for(auto heh : mHullMesh.halfedges())
 				{
-					if(mHullMesh.is_boundary(heh))
-					{
+                    if(mHullMesh.is_boundary(heh) && mHullMesh.status(heh).tagged())
+                    {
+                        mHullMesh.status(heh).set_tagged(false);
 						auto fromVh = mHullMesh.from_vertex_handle(heh);
 						auto toVh = mHullMesh.to_vertex_handle(heh);
                         //mHullMesh.add_face(fromVh, toVh, hullVh);
                         if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
                         {
-                            //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
-
+                            OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
+                            mHullMesh.add_face(toVh, fromVh, hullVh);
                             std::cout << "beta3" << std::endl;
                             break;
 
                         }
-					}
+                    }
 				}
 			}
 			//		MeshProcessing::writeMesh(hull, "D:/test.ply");
@@ -128,10 +134,10 @@ void Incremental::incremental()
 	}
 
 	mInputMesh.release_vertex_status();
-
+    mInputMesh.release_halfedge_status();
 	mHullMesh.release_face_status();
 	mHullMesh.release_vertex_status();
-	mHullMesh.release_edge_status();
+    mHullMesh.release_edge_status();
 
     //flipHullMesh();
 }
