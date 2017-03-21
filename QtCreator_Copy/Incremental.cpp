@@ -117,13 +117,13 @@ void Incremental::incremental()
                         mHullMesh.status(heh).set_tagged(false);
 						auto fromVh = mHullMesh.from_vertex_handle(heh);
 						auto toVh = mHullMesh.to_vertex_handle(heh);
-                        //mHullMesh.add_face(fromVh, toVh, hullVh);
-                        if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
+                        mHullMesh.add_face(fromVh, toVh, hullVh);
+                        /*if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
                         {
                             //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
                             mHullMesh.add_face(toVh, fromVh, hullVh);
                             std::cout << "beta3" << std::endl;
-                        }
+                        }*/
                     }
 				}
 			}
