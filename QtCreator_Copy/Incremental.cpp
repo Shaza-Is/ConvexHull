@@ -112,7 +112,7 @@ void Incremental::incremental()
 
                 for(auto heh : mHullMesh.halfedges())
 				{
-                    if(mHullMesh.is_boundary(heh) && mHullMesh.status(heh).tagged())
+                    if(mHullMesh.is_boundary(heh) || mHullMesh.status(heh).tagged())
                     {
                         mHullMesh.status(heh).set_tagged(false);
 						auto fromVh = mHullMesh.from_vertex_handle(heh);
@@ -120,11 +120,9 @@ void Incremental::incremental()
                         //mHullMesh.add_face(fromVh, toVh, hullVh);
                         if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
                         {
-                            OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
+                            //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
                             mHullMesh.add_face(toVh, fromVh, hullVh);
                             std::cout << "beta3" << std::endl;
-                            break;
-
                         }
                     }
 				}
