@@ -1,7 +1,7 @@
-#ifndef ONVEXHULL_H
+#ifndef CONVEXHULL_H
 #define CONVEXHULL_H
 // -------------------- C++ 
-#include <iostream>
+#include <memory>
 #include "Incremental.h"
 #include "HullAlgorithm.h"
 
@@ -17,12 +17,11 @@ enum Algorithms
 class ConvexHull
 {
 public:
-    ConvexHull(const TriMesh& _mesh, Algorithms a=IncrementalAlogrithm);
-    TriMesh getHull();
-    ~ConvexHull();
+    ConvexHull(const TriMesh& _mesh, Algorithms _algorithm=IncrementalAlogrithm);
+    TriMesh getHull() const;
 
 private:
-	HullAlgorithm * algorithm;        
+    std::unique_ptr<HullAlgorithm> algorithm;
 };
 
 #endif //CONVEXHULL_H

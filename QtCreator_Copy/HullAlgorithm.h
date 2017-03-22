@@ -10,7 +10,7 @@ class HullAlgorithm
 {
 public:
     virtual TriMesh getResult() const=0;
-    virtual ~HullAlgorithm();
+    virtual ~HullAlgorithm(){}
 };
 
 #endif //HULLALGORITHM_H

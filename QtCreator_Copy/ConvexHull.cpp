@@ -1,19 +1,16 @@
 // -------------------- C++ 
-#include <iostream>
 #include "ConvexHull.h"
 
-ConvexHull::ConvexHull(const TriMesh &_mesh, Algorithms a)
+ConvexHull::ConvexHull(const TriMesh &_mesh, Algorithms _algorithm)
 {
-    if(a == IncrementalAlogrithm)
-    algorithm = new Incremental(_mesh);
+    if(_algorithm == IncrementalAlogrithm)
+    algorithm = std::unique_ptr<Incremental>(new Incremental(_mesh));
+
 }
 
-TriMesh ConvexHull::getHull()
+TriMesh ConvexHull::getHull() const
 {
     return algorithm->getResult();
 }
 
-ConvexHull::~ConvexHull()
-{
-    delete algorithm;
-}
+

@@ -2,7 +2,7 @@
 #include <array>
 #include <iostream>
 #include "Incremental.h"
-//#include "MeshProcessing\MeshProcessing.h"
+
 
 
 Incremental::Incremental( const TriMesh& _mesh )
@@ -14,11 +14,6 @@ Incremental::Incremental( const TriMesh& _mesh )
 TriMesh Incremental::getResult() const
 {
     return mHullMesh;
-}
-
-Incremental::~Incremental()
-{
-
 }
 
 void Incremental::createInitialTetrahedron()
@@ -93,7 +88,6 @@ void Incremental::incremental()
                 if (OpenMesh::dot(tetrahedronEdges[2], OpenMesh::cross(tetrahedronEdges[1], tetrahedronEdges[0])) > (std::numeric_limits<float>::epsilon()))
                     visibleFaces.push_back(fh);
             }
-            //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/before_del.ply");
 
 
             for (const auto&fh : visibleFaces)
@@ -117,13 +111,10 @@ void Incremental::incremental()
                         mHullMesh.status(heh).set_tagged(false);
                         auto fromVh = mHullMesh.from_vertex_handle(heh);
                         auto toVh = mHullMesh.to_vertex_handle(heh);
+                        /*if(OpenMesh::cross(mHullMesh.point(toVh) - mHullMesh.point(fromVh),
+                                           mHullMesh.point(fromVh) -mHullMesh.point(hullVh)).norm()  > (std::numeric_limits<float>::epsilon()))
+                        */
                         mHullMesh.add_face(fromVh, toVh, hullVh);
-                        /*if(!mHullMesh.add_face(fromVh, toVh, hullVh).is_valid())
-                        {
-                            //OpenMesh::IO::write_mesh(mHullMesh, "/home/shaza/Desktop/adding_problem.ply");
-                            mHullMesh.add_face(toVh, fromVh, hullVh);
-                            std::cout << "beta3" << std::endl;
-                        }*/
                     }
                 }
             }
@@ -140,22 +131,3 @@ void Incremental::incremental()
     //flipHullMesh();
 }
 
-void Incremental::flipHullMesh()
-{
-	TriMesh flippedHull;
-
-	for (const auto& vh : mHullMesh.vertices())
-		flippedHull.add_vertex(mHullMesh.point(vh));
-
-    std::array<OpenMesh::VertexHandle, 3> flippedFaceVhs;
-	for (const auto& fh : mHullMesh.faces())
-	{
-		int i = 0;
-		for (const auto& fvh : mHullMesh.fv_range(fh))
-			flippedFaceVhs[i++] = fvh;
-
-		flippedHull.add_face(flippedFaceVhs[2], flippedFaceVhs[1], flippedFaceVhs[0]);
-	}
-
-	mHullMesh = flippedHull;
-}
