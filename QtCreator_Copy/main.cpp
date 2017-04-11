@@ -1,12 +1,12 @@
 // -------------------- C++
 #include <iostream>
+#include <cstdlib>
 
 // -------------------- OpenMesh
 #include <OpenMesh/Core/IO/MeshIO.hh>
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+#include "meshtype.h"
 
 #include "ConvexHull.h"
-typedef OpenMesh::TriMesh_ArrayKernelT<> TriMesh;
 using namespace std;
 
 int main()
@@ -19,7 +19,7 @@ int main()
     if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/terr.ply"))
     {
         std::cerr << "read error\n";
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /*algorithm*/
@@ -30,8 +30,8 @@ int main()
     if (!OpenMesh::IO::write_mesh(hull, "/home/shaza/Desktop/output.ply"))
     {
         std::cerr << "write error\n";
-        exit(1);
+        exit(EXIT_FAILURE);
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 

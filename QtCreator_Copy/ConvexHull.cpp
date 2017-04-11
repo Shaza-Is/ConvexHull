@@ -3,9 +3,12 @@
 
 ConvexHull::ConvexHull(const TriMesh &_mesh, Algorithms _algorithm)
 {
-    if(_algorithm == IncrementalAlogrithm)
-    algorithm = std::unique_ptr<Incremental>(new Incremental(_mesh));
-
+    switch(_algorithm)
+    {
+        case Algorithms::IncrementalAlogrithm :
+            algorithm = std::unique_ptr<Incremental>(new Incremental(_mesh));
+            break;
+    }
 }
 
 TriMesh ConvexHull::getHull() const

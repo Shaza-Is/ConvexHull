@@ -13,6 +13,7 @@ SOURCES += main.cpp \
 HEADERS += \
     Incremental.h\
     ConvexHull.h\
-    HullAlgorithm.h
+    HullAlgorithm.h \
+    meshtype.h
 
 

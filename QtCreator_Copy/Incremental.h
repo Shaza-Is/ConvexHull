@@ -1,12 +1,12 @@
 #ifndef INCREMENTAL_H
 #define INCREMENTAL_H
 // -------------------- OpenMesh
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+#include "meshtype.h"
 #include <OpenMesh/Core/Mesh/PolyConnectivity.hh>
 #include <OpenMesh/Core/Mesh/TriConnectivity.hh>
 #include "HullAlgorithm.h"
 
-typedef OpenMesh::TriMesh_ArrayKernelT<> TriMesh;
+
 
 
 class Incremental : public HullAlgorithm

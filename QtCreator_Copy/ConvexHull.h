@@ -6,18 +6,18 @@
 #include "HullAlgorithm.h"
 
 // -------------------- OpenMesh
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-typedef OpenMesh::TriMesh_ArrayKernelT<> TriMesh;
+#include "meshtype.h"
 
-enum Algorithms
+enum class Algorithms
 {
     IncrementalAlogrithm
 };
+class HullAlgorithm;
 
 class ConvexHull
 {
 public:
-    ConvexHull(const TriMesh& _mesh, Algorithms _algorithm=IncrementalAlogrithm);
+    ConvexHull(const TriMesh& _mesh, Algorithms _algorithm=Algorithms::IncrementalAlogrithm);
     TriMesh getHull() const;
 
 private:
