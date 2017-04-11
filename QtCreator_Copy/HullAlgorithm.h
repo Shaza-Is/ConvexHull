@@ -3,8 +3,6 @@
 // -------------------- OpenMesh
 #include "meshtype.h"
 
-
-
 class HullAlgorithm
 {
 public:

@@ -1,19 +1,17 @@
 // -------------------- C++
 #include <iostream>
 #include <cstdlib>
-
 // -------------------- OpenMesh
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include "meshtype.h"
-
 #include "ConvexHull.h"
+
 using namespace std;
 
 int main()
 {
     TriMesh mesh;
     TriMesh hull;
-
 
     /*reader*/
     if (!OpenMesh::IO::read_mesh(mesh, "/home/shaza/Desktop/terr.ply"))
@@ -34,4 +32,3 @@ int main()
     }
     return EXIT_SUCCESS;
 }
-

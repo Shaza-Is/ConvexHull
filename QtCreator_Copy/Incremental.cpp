@@ -3,8 +3,6 @@
 #include <iostream>
 #include "Incremental.h"
 
-
-
 Incremental::Incremental( const TriMesh& _mesh )
     :mInputMesh(_mesh)
 {
@@ -127,7 +125,4 @@ void Incremental::incremental()
     mHullMesh.release_face_status();
     mHullMesh.release_vertex_status();
     mHullMesh.release_edge_status();
-
-    //flipHullMesh();
 }
-

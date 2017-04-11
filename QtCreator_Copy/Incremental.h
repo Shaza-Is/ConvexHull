@@ -6,9 +6,6 @@
 #include <OpenMesh/Core/Mesh/TriConnectivity.hh>
 #include "HullAlgorithm.h"
 
-
-
-
 class Incremental : public HullAlgorithm
 {
 public:

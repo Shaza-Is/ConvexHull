@@ -15,5 +15,3 @@ TriMesh ConvexHull::getHull() const
 {
     return algorithm->getResult();
 }
-
-
