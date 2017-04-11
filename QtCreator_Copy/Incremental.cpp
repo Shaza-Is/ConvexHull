@@ -17,34 +17,33 @@ TriMesh Incremental::getResult() const
 void Incremental::createInitialTetrahedron()
 {
     // create the initial hull (the processed point will be marked as tagged)
-
+    // initial face
     for (const auto& vh : mInputMesh.fv_range(OpenMesh::FaceHandle(0)))
     {
         mInputMesh.status(vh).set_tagged(true);
         mHullMesh.add_vertex(mInputMesh.point(vh));
     }
-
+    // getting the distance by which the face is displaced
     auto normal = mInputMesh.calc_face_normal(OpenMesh::FaceHandle(0));
-    auto d = -OpenMesh::dot(normal, mHullMesh.point(OpenMesh::VertexHandle(0)));
+    auto dist = -1.0f * OpenMesh::dot(normal, mHullMesh.point(OpenMesh::VertexHandle(0)));
 
     OpenMesh::VertexHandle maxVh;
     auto maxDistance = 0.0f;
-
+    // getting the furthest point from the initial face to construct the initial tetrahedron
     for (const auto& vh : mInputMesh.vertices())
     {
-        auto distance = std::fabs(OpenMesh::dot(normal, mInputMesh.point(vh)) + d);
+        auto distance = std::fabs(OpenMesh::dot(normal, mInputMesh.point(vh)) + dist);
         if (distance > maxDistance)
         {
             maxDistance = distance;
             maxVh = vh;
         }
     }
-
-
+    // adding the point that makes the largest possible tetrahedron with the initial face
     mInputMesh.status(maxVh).set_tagged(true);
     mHullMesh.add_vertex(mInputMesh.point(maxVh));
 
-    // triangulate the hull
+    // triangulate the hull between the fourth point and initial face
     mHullMesh.add_face(OpenMesh::VertexHandle(0), OpenMesh::VertexHandle(1), OpenMesh::VertexHandle(2));
     mHullMesh.add_face(OpenMesh::VertexHandle(3), OpenMesh::VertexHandle(0), OpenMesh::VertexHandle(2));
     mHullMesh.add_face(OpenMesh::VertexHandle(2), OpenMesh::VertexHandle(1), OpenMesh::VertexHandle(3));
@@ -116,7 +115,6 @@ void Incremental::incremental()
                     }
                 }
             }
-            //		MeshProcessing::writeMesh(hull, "D:/test.ply");
         }
     }
 
